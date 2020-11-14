@@ -16,6 +16,7 @@ import sys
 import re
 import uuid
 import threading
+import os
 
 from threading import Thread
 from cmd import Cmd
@@ -64,7 +65,10 @@ class ShellManagerCli(Cmd):
     use_rawinput = False
 
     def __init__(self, flag_queue, shells, completekey='tab', stdin=None, stdout=None):
-        super(ShellManagerCli, self).__init__(completekey, stdin, stdout)
+        if sys.version_info[0] < 3:
+            Cmd.__init__(self, completekey, stdin, stdout)
+        else:
+            super(ShellManagerCli, self).__init__(completekey, stdin, stdout)
         self.flag_queue = flag_queue
         self.shells = shells
         self.prompt = PROMPT_TERM
@@ -215,12 +219,12 @@ class ShellManagerServer(Thread):
                             stdin=pipe, stdout=pipe).cmdloop()
         except OSError as e:
             pass
-        except Exception as e:
+        except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logger.info(
                 "[-] Fail to handle ShellManagerClient ... %s(%s) at %s:%d",
-                exc_type, ''.join(ex.args), fname, exc_tb.tb_lineno)
+                exc_type, ''.join(str(ex)), fname, exc_tb.tb_lineno)
             return
         logger.info(
             "[+] Client %s:%d disconnect from ShellManagerServer", addr[0], addr[1])

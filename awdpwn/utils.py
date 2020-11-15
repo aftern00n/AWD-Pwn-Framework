@@ -94,25 +94,25 @@ class TargetsManager(object):
 
     @classmethod
     def get(cls, name, *keys):
+        '''
+        There was a problem with the previous strategy, so I change it.
+        In addition to the specific configuration for each challenge, there is also a default configuration.
+        We first read the content from the specific configuration, if we don't find the key we will read the default configuration.
+        '''
         if name not in cls.targets_info:
-            parents = []
+            res = [None] * len(keys)
         else:
-            parents = [name]
-        parents += [s[:-1] for s in filter(name.startswith, [
-            s + '.' for s in cls.targets_info.keys()])]
-        parents.sort(reverse=True)
-        parents.append('defaults')
-        res = []
-        for key in keys:
-            found = False
-            for parent in parents:
-                parent_info = cls.targets_info[parent]
-                if key in parent_info:
+            res = []
+            for key in keys:
+                found = False
+                if key in cls.targets_info[name]:
                     found = True
-                    res.append(parent_info[key])
-                    break
-            if not found:
-                res.append(None)
+                    res.append(cls.targets_info[name][key])
+                elif key in cls.targets_info['defaults']:
+                    found = True
+                    res.append(cls.targets_info['defaults'][key])
+                if not found:
+                    res.append(None)
         if len(res) == 1:
             return res[0]
         else:
@@ -127,12 +127,13 @@ class TargetsManager(object):
         return cls.save()
 
     @classmethod
-    def create(cls, name, port=10001, enable=False):
+    def create(cls, name, port=10001, enable=False, keep_shell=False):
         if name in cls.targets_info:
             return False
         cls.targets_info[name] = {
             'port': port,
-            'enable': enable
+            'enable': enable,
+            'keep_shell' : keep_shell
         }
         return cls.save()
 
@@ -147,7 +148,7 @@ class TargetsManager(object):
         if 'defaults' not in cls.targets_info:
             return False
         for key in cls.default_targets_info['defaults']:
-            if key not in cls.targets_info:
+            if key not in cls.targets_info['defaults']:
                 return False
         return True
 

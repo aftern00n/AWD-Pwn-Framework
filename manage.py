@@ -22,7 +22,7 @@ else:
     from queue import Queue
 
 from awdpwn.utils import (
-    n2mn, mn2p, TargetsManager, confirm_exit, alarm_incomplete
+    n2mn, mn2p, TargetsManager, confirm_exit, alarm_incomplete, targets_path
 )
 from awdpwn.attack import Pwner
 from awdpwn.watch import WatchHandler
@@ -45,6 +45,16 @@ if sys.version_info[0] < 3:
 @click.group()
 def cli():
     pass
+
+@cli.command()
+def init():
+    """Initialize targets.json
+    """
+    with open(os.path.join(awdpwn_path, "prelude/default_targets.json"), 'r') as f:
+        default_targets_info = json.load(f)
+    with open(targets_path, 'w+') as f:
+        json.dump(default_targets_info, f, sort_keys=False,
+                  indent=4, separators=(',', ': '))
 
 
 @cli.command()

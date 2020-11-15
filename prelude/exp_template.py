@@ -1,22 +1,31 @@
 from pwn import *
+import uuid
 
 binary = "{binary}"
 dbg_script = '''
 '''
 
-def get_flag(io):
-    return ""
 
 def pwn_remote(ip, port, *args, **kargs):
     '''pwn remote gamebox [ip]:[port], return flag and io'''
-    io = remote(ip, port)
-    flag = get_flag(io)
-    if not kargs.get('keep_alive'):
-        io.close()
-    return flag, io
+    p = remote(ip, port)
 
-def pwn_local(io, debug=False):
-    get_flag(io)
+
+    '''put payload in it'''
+
+
+    spliter = str(uuid.uuid1())
+    command = "cat /flag"
+    command_warpper = '\necho {} ; {} ; echo {}\n'.format(
+        spliter, command, spliter)
+    p.send(command_warpper)
+    p.recvuntil(spliter + '\n')
+    flag = p.recvuntil(spliter, drop=True)
+
+    if not kargs.get('keep_alive'):
+        p.close()
+
+    return flag, p
 
 if __name__ == '__main__':
     pass

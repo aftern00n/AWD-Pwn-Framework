@@ -37,7 +37,7 @@ class Submitter(Thread):
         self.queue = queue
 
     def do_submit(self, flag):
-        submit_json = config.get('submit', 'submit_json', fallback='submit.json')
+        submit_json = config.get('submit', 'submit_json')
         submit_json = os.path.join(awdpwn_path, submit_json)
         try:
             with open(submit_json, 'r') as f:

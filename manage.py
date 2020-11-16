@@ -59,9 +59,8 @@ def init():
 
 @cli.command()
 @click.argument('name')
-@click.option('--binary', default='pwn', help="path/to/binary")
 @click.option('--port', default=10001, help="port of gamebox")
-def add(name, binary, port):
+def add(name, port):
     """Add a expolits namespace
     """
     path = mn2p(n2mn(name))
@@ -80,7 +79,7 @@ def add(name, binary, port):
         except IOError:
             pass
         tmp = os.path.dirname(tmp)
-    exp = exp_template.format(binary=binary)
+    exp = exp_template
     try:
         with open(path, 'w+') as f:
             f.write(exp)

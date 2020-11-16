@@ -201,7 +201,7 @@ class ShellManagerServer(Thread):
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logger.info(
                 "[-] Fail to start ShellManagerServer ... %s(%s) at %s:%d",
-                exc_type, ''.join(ex.args), fname, exc_tb.tb_lineno)
+                exc_type, ''.join(str(ex)), fname, exc_tb.tb_lineno)
             return
         logger.info("[+] ShellManagerServer listen on %s:%d", host, port)
 

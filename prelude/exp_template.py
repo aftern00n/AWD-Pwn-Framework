@@ -8,7 +8,7 @@ dbg_script = '''
 
 def pwn_remote(ip, port, *args, **kargs):
     '''pwn remote gamebox [ip]:[port], return flag and io'''
-    p = remote(ip, port)
+    #p = remote(ip, port)
 
 
     '''put payload in it'''
@@ -20,7 +20,7 @@ def pwn_remote(ip, port, *args, **kargs):
         spliter, command, spliter)
     p.send(command_warpper)
     p.recvuntil(spliter + '\n')
-    flag = p.recvuntil(spliter, drop=True)
+    flag = p.recvuntil(spliter, drop=True).strip()
 
     if not kargs.get('keep_alive'):
         p.close()

@@ -42,12 +42,13 @@ class Submitter(Thread):
         try:
             with open(submit_json, 'r') as f:
                 meta_str = f.read()
-                meta_str.replace('{flag}', flag)
+                meta_str = meta_str.replace('{flag}', flag)
+                meta_str = meta_str.replace('{token}', self.token)
                 meta = json.loads(meta_str)
         except IOError as e:
             logger.info("[-] Fail to find submit_json %s", repr(submit_json))
             return False
-        except json.JSONDecodeError as e:
+        except Exception as e:
             logger.info("[-] Fail to decode submit_json %s", repr(submit_json))
             return False
         try:
@@ -59,6 +60,9 @@ class Submitter(Thread):
                 flag, exc_type, ''.join(ex.args), fname, exc_tb.tb_lineno)
             return False
         content = response.content
+        msg = "[+] Submit flag : [{}] ... !!Response!! ({})".format(
+            flag, content)
+        logger.info(msg)
         if self.fail_text in content:
             msg = "[-] Submit flag : [{}] ... !!Failed!! ({})".format(
                 flag, content)

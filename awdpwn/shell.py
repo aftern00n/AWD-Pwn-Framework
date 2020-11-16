@@ -17,11 +17,12 @@ import re
 import uuid
 import threading
 import os
+import base64
 
 from threading import Thread
 from cmd import Cmd
 
-from .utils import get_shell_name, parse_shell_name, TargetsManager
+from .utils import get_shell_name, parse_shell_name, TargetsManager, awdpwn_path
 from .config import config
 from .log import logger
 
@@ -83,6 +84,30 @@ class ShellManagerCli(Cmd):
         command = res[1].strip()
         if command.startswith('"'):
             command = eval(command)
+        for shell_name, io in ios:
+            self.write('[{}]\n'.format(shell_name))
+            try:
+                output = self.check_output(io, command)
+            except IOError:
+                self.write(
+                    "[-] {} Broken ... Removed\n".format(shell_name))
+                continue
+            self.write(output)
+
+    def do_upload(self, arg):
+        res = arg.split(None)
+        if len(res) != 3:
+            self.write("Usage: upload TARGETS FILENAME(which in upload directory) SAVEPATH\n")
+            return
+        target = res[0].strip()
+        ios = self.get_ios(target)
+        filename = res[1].strip()
+        save_path = res[2].strip()
+        file_path = os.path.join(awdpwn_path, 'upload', filename)
+        if not os.path.exists(file_path):
+            self.write("{} not exists\n".format(file_path))
+            return
+        command = "echo {0} | base64 -d > {1}/{2}; ls {1}".format(base64.b64encode(open(file_path, 'rb').read()), save_path, filename)
         for shell_name, io in ios:
             self.write('[{}]\n'.format(shell_name))
             try:

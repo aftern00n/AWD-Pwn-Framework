@@ -78,7 +78,7 @@ class Pwner(Thread):
         if not self.scope:
             return True
         else:
-            return name.startswith(self.scope + '.')
+            return name.startswith(self.scope)
 
     def pwn_all(self, name, exp):
         ip_list, port, flag_pattern = TargetsManager.get(

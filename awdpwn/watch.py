@@ -44,7 +44,6 @@ class WatchHandler(FileSystemEventHandler):
         if path == 'config.ini':
             load_config()
         elif path == 'targets.json':
-
             TargetsManager.load()
         elif not path.endswith('exp.py'):
             return

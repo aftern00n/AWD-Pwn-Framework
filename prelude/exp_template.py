@@ -8,12 +8,12 @@ dbg_script = '''
 
 def pwn_remote(ip, port, *args, **kargs):
     '''pwn remote gamebox [ip]:[port], return flag and io'''
-    #p = remote(ip, port)
-
+    context.timeout = 5
 
     '''put payload in it'''
 
 
+    p = remote(ip, port)
     spliter = str(uuid.uuid1())
     command = "cat /flag"
     command_warpper = '\necho {} ; {} ; echo {}\n'.format(

@@ -46,13 +46,13 @@ class Pwner(Thread):
         self.flag_queue = flag_queue
         self.shells = shells
         self.load_exps()
-        self.names = set(self.exps.keys()).intersection(
-            set(TargetsManager.names()))
+        self.names = set(self.exps.keys()).intersection(set(TargetsManager.names()))
 
     def run(self):
         while True:
             threads = []
             pwn_interval = float(config.get('pwner', 'pwn_interval'))
+            self.names = set(self.exps.keys()).intersection(set(TargetsManager.names()))
             for name in self.names:
                 # check enable
                 if name not in TargetsManager.names() or not TargetsManager.get(name, 'enable'):

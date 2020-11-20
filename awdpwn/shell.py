@@ -294,7 +294,7 @@ class ShellManagerClient:
                     except IOError as e:
                         print(e)
                 sys.stdout.write(buf)
-                cmd = input() + '\n'
+                cmd = input()
                 striped_cmd = cmd.strip()
                 if striped_cmd == 'quit' or striped_cmd == 'exit' or striped_cmd == 'q':
                     break

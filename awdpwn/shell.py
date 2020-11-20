@@ -88,9 +88,11 @@ class ShellManagerCli(Cmd):
             self.write('[{}]\n'.format(shell_name))
             try:
                 output = self.check_output(io, command)
-            except IOError:
+            except Exception as e:
+                io.close()
                 self.write(
                     "[-] {} Broken ... Removed\n".format(shell_name))
+                self.shells.pop(shell_name)
                 continue
             self.write(output)
 
@@ -112,9 +114,11 @@ class ShellManagerCli(Cmd):
             self.write('[{}]\n'.format(shell_name))
             try:
                 output = self.check_output(io, command)
-            except IOError:
+            except Exception as e:
+                io.close()
                 self.write(
                     "[-] {} Broken ... Removed\n".format(shell_name))
+                self.shells.pop(shell_name)
                 continue
             self.write(output)
 
@@ -126,11 +130,17 @@ class ShellManagerCli(Cmd):
             ios = self.get_ios(target)
         for shell_name, io in ios:
             self.write('[{}]\n'.format(shell_name))
-            name, _, _ = parse_shell_name(shell_name)
-            cat_flag = TargetsManager.get(name, 'cat_flag')
-            output = self.check_output(io, cat_flag)
-            self.write(output + '\n')
-            self.flag_queue.put(output.strip())
+            try:
+                name, _, _ = parse_shell_name(shell_name)
+                cat_flag = TargetsManager.get(name, 'cat_flag')
+                output = self.check_output(io, cat_flag)
+                self.write(output + '\n')
+                self.flag_queue.put(output.strip())
+            except Exception as e:
+                io.close()
+                self.write(
+                    "[-] {} Broken ... Removed\n".format(shell_name))
+                self.shells.pop(shell_name)
 
     def do_long_connection(self, target):
         target = target.strip()
@@ -144,9 +154,11 @@ class ShellManagerCli(Cmd):
             logger.info("[+] PWN %s\n%s" % (shell_name, command))
             try:
                 output = self.check_output(io, command)
-            except IOError:
+            except Exception as e:
+                io.close()
                 self.write(
                     "[-] {} Broken ... Removed\n".format(shell_name))
+                self.shells.pop(shell_name)
                 continue
             self.write(output)
 
@@ -166,7 +178,8 @@ class ShellManagerCli(Cmd):
                 return
             try:
                 output = self.check_output(io, command)
-            except IOError:
+            except Exception as e:
+                io.close()
                 self.write("[-] Broken")
             if output:
                 self.write(output)

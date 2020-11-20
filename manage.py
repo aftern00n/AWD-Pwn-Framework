@@ -119,7 +119,7 @@ def disable(name):
 def enable(name):
     """Enable namespace
     """
-    TargetsManager.modify(name, enable=True)
+    TargetsManager.modify(name, enable=True, keep_shell=True)
 
 
 @cli.command()

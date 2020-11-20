@@ -57,7 +57,7 @@ class Submitter(Thread):
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logger.info("[-] Submit flag : [%s] ... !!Failed!! %s(%s) at %s:%d",
-                flag, exc_type, ''.join(ex.args), fname, exc_tb.tb_lineno)
+                flag, exc_type, ''.join(str(ex)), fname, exc_tb.tb_lineno)
             return False
         content = response.content
         msg = "[+] Submit flag : [{}] ... !!Response!! ({})".format(

